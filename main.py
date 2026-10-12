@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 
 def main():
@@ -94,6 +95,7 @@ def complete_task(tasks):
     for i in tasks:
         if i["name"] == task_name:
             i["completed"] = True
+            i["completed_at"] = datetime.now().strftime("%-m/%-d/%y - %-I:%M")
             break
 
 
@@ -142,6 +144,7 @@ def print_completed_tasks(tasks):
                         "COMPLETED TASK #" + str(k) + "\n",
                         i["name"] + "\n",
                         i["weekday"] + "\n",
+                        i["completed_at"] + "\n",
                         "--------------------------------",
                         sep=""
                     )
@@ -149,7 +152,6 @@ def print_completed_tasks(tasks):
 main()
 
 # FEATURES TO ADD
-    # Add time to completed tasks
     # Make the lists print neater
         # Sort by weekday
     # Return message if a task is already completed or not (eg. the user is trying to complete a completed task)
