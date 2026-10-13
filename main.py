@@ -94,9 +94,13 @@ def complete_task(tasks):
     # Iterate through tasks and check for correct task name
     for i in tasks:
         if i["name"] == task_name:
-            i["completed"] = True
-            i["completed_at"] = datetime.now().strftime("%-m/%-d/%y - %-I:%M")
-            break
+            if i["completed"]:
+                print("This task was already completed at " + i["completed_at"])
+                break
+            else:
+                i["completed"] = True
+                i["completed_at"] = datetime.now().strftime("%-m/%-d/%y - %-I:%M")
+                break
 
 
 # 3. Remove task
@@ -154,7 +158,6 @@ main()
 # FEATURES TO ADD
     # Make the lists print neater
         # Sort by weekday
-    # Return message if a task is already completed or not (eg. the user is trying to complete a completed task)
     # Add substeps
     # Suggestions from AI?
         # Create a task class?
