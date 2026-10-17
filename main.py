@@ -1,88 +1,83 @@
 from datetime import datetime
 import sys
 
+from matplotlib.dates import WEEKDAYS
+
 def main():
     # Initialize task list
     tasks = []
-    days_of_the_week = {
-        "1": "Monday",
-        "2": "Tuesday",
-        "3": "Wednesday",
-        "4": "Thursday",
-        "5": "Friday",
-        "6": "Saturday",
-        "7": "Sunday"
+    WEEKDAYS = {
+                "1": "Monday",
+                "2": "Tuesday",
+                "3": "Wednesday",
+                "4": "Thursday",
+                "5": "Friday",
+                "6": "Saturday",
+                "7": "Sunday",
     }
+    WEEKDAY_ORDER = {day: int(number) for number, day in WEEKDAYS.items()}
     
     # Automatically display tasks at start
-    print_current_tasks(tasks, days_of_the_week)
+    print_current_tasks(tasks, WEEKDAYS)
     
     while True:
         # Prompt user for next action
         print(
-                "\n1. Add task",
-                "2. Complete task",
-                "3. Remove task",
-                "4. View current tasks",
-                "5. View completed tasks",
-                "6. Exit\n",
-                sep="\n"
-            )
+            "\n1. Add task",
+            "2. Complete task",
+            "3. Remove task",
+            "4. View current tasks",
+            "5. View completed tasks",
+            "6. Exit\n",
+            sep="\n"
+        )
 
         # Prompt user for next action and convert choice to integer
         action = int(input("What would you like to do?  Enter a number: "))
         print()
 
         if action == 1:
-            add_task(tasks, days_of_the_week)
+            add_task(tasks, WEEKDAYS)
         elif action == 2:
-            complete_task(tasks, days_of_the_week)
+            complete_task(tasks, WEEKDAYS)
         elif action == 3:
             remove_task(tasks)
         elif action == 4:
-            print_current_tasks(tasks, days_of_the_week)
+            print_current_tasks(tasks, WEEKDAY_ORDER)
         elif action == 5:
-            print_completed_tasks(tasks, days_of_the_week)
+            print_completed_tasks(tasks, WEEKDAY_ORDER)
         elif action == 6:
             sys.exit()
 
 # Option functions
 # 1. Add task
-def add_task(tasks, days_of_the_week):
+def add_task(tasks, WEEKDAYS):
     task_name = input("Name of task: ").capitalize()
 
     print(
-            "\n1. Monday",
-            "2. Tuesday",
-            "3. Wednesday",
-            "4. Thursday",
-            "5. Friday",
-            "6. Saturday",
-            "7. Sunday\n",
-            sep="\n"
-        )
+        "\n1. Monday",
+        "2. Tuesday",
+        "3. Wednesday",
+        "4. Thursday",
+        "5. Friday",
+        "6. Saturday",
+        "7. Sunday\n",
+        sep="\n"
+    )
 
     # Prompt user for weekday number and check if valid
     while True:
-        task_day_number = input("Weekday: ")
-
-        if task_day_number in days_of_the_week:
-            task_day = days_of_the_week[task_day_number]
+        task_day = WEEKDAYS.get(input("Weekday: ").strip())
+        if task_day is not None:
             break
-        else:
-            print("\nINVALID WEEKDAY NUMBER. PLEASE ENTER A NUMBER BETWEEN 1 AND 7.\n")
-            continue
+        print("\nINVALID WEEKDAY NUMBER. PLEASE ENTER A NUMBER BETWEEN 1 AND 7.\n")
 
-    # Sort tasks based on weekday
-    # Generate number of chosen weekday
-
-    
     # Add to tasks
     tasks.append({"name": task_name, "weekday": task_day, "completed": False})
 
 
 # 2. Complete task
-def complete_task(tasks, days_of_the_week):
+def complete_task(tasks, WEEKDAYS):
     task_name = input("Name of task: ").capitalize()
 
     # Iterate through tasks and check for correct task name
@@ -111,52 +106,55 @@ def remove_task(tasks):
 
 
 # 4. View current tasks
-def print_current_tasks(tasks, days_of_the_week):
-    current_tasks = [task for task in tasks if not task["completed"]]
+def print_current_tasks(tasks, WEEKDAY_ORDER):
+    sorted_current_tasks = sorted(
+            (task for task in tasks if not task["completed"]),
+            key=lambda task: WEEKDAY_ORDER[task["weekday"]],
+    )
 
-    if not current_tasks:
+    if not sorted_current_tasks:
         print("NO CURRENT TASKS TO DISPLAY")
         return
     
-    # Iterate through tasks and check if completed flag is False
+    # Print sorted current tasks
     k = 0
-    for task in tasks:
-        if not task["completed"]:
-            k += 1
-            print(
-                    "TASK #" + str(k) + "\n",
-                    task["name"] + "\n",
-                    task["weekday"] + "\n",
-                    "--------------------------------",
-                    sep=""
-                )
+    for i in sorted_current_tasks:
+        k += 1
+        print(
+            "TASK #" + str(k) + "\n",
+            i["name"] + "\n",
+            i["weekday"] + "\n",
+            "--------------------------------",
+            sep=""
+        )
 
 
 # 5. View completed tasks
-def print_completed_tasks(tasks, days_of_the_week):
-    completed_tasks = [task for task in tasks if task["completed"]]
-
-    if not completed_tasks:
+def print_completed_tasks(tasks, WEEKDAY_ORDER):
+    sorted_completed_tasks = sorted(
+            (task for task in tasks if task["completed"]),
+            key=lambda task: WEEKDAY_ORDER[task["weekday"]],
+    )
+    
+    if not sorted_completed_tasks:
         print("NO COMPLETED TASKS TO DISPLAY")
         return
-
-    # Iterate through completed tasks and print them
+    
+    # Print sorted completed tasks
     k = 0
-    for task in completed_tasks:
+    for i in sorted_completed_tasks:
         k += 1
         print(
-                "COMPLETED TASK #" + str(k) + "\n",
-                task["name"] + "\n",
-                task["weekday"] + "\n",
-                task["completed_at"] + "\n",
-                "--------------------------------",
-                sep=""
-            )
+            "TASK #" + str(k) + "\n",
+            i["name"] + "\n",
+            i["weekday"] + "\n",
+            "--------------------------------",
+            sep=""
+        )
 
 main()
 
 # FEATURES TO ADD
-    # Sort task list by weekday
     # Add substeps
     # Suggestions from AI?
         # Create a task class?
