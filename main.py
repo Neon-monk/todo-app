@@ -24,11 +24,12 @@ def main():
         # Prompt user for next action
         print(
             "\n1. Add task",
-            "2. Complete task",
-            "3. Remove task",
-            "4. View current tasks",
-            "5. View completed tasks",
-            "6. Exit\n",
+            "2. Add subtask",
+            "3. Complete task",
+            "4. Remove task",
+            "5. View current tasks",
+            "6. View completed tasks",
+            "7. Exit\n",
             sep="\n"
         )
 
@@ -39,14 +40,16 @@ def main():
         if action == 1:
             add_task(tasks, WEEKDAYS)
         elif action == 2:
-            complete_task(tasks, WEEKDAYS)
+            add_subtask(tasks)
         elif action == 3:
-            remove_task(tasks)
+            complete_task(tasks, WEEKDAYS)
         elif action == 4:
-            print_current_tasks(tasks, WEEKDAY_ORDER)
+            remove_task(tasks)
         elif action == 5:
-            print_completed_tasks(tasks, WEEKDAY_ORDER)
+            print_current_tasks(tasks, WEEKDAY_ORDER)
         elif action == 6:
+            print_completed_tasks(tasks, WEEKDAY_ORDER)
+        elif action == 7:
             sys.exit()
 
 # Option functions
@@ -75,8 +78,20 @@ def add_task(tasks, WEEKDAYS):
     # Add to tasks
     tasks.append({"name": task_name, "weekday": task_day, "completed": False})
 
+# 2. Add subtask
+def add_subtask(tasks):
+    task_name = input("Name of task: ").capitalize()
+    subtask_name = input("Name of subtask: ").capitalize()
 
-# 2. Complete task
+    # Iterate through tasks and check for correct task name
+    for task in tasks:
+        if task["name"] == task_name:
+            if "subtask" not in task:
+                task["subtask"] = []
+            task["subtask"].append(subtask_name)
+            break
+
+# 3. Complete task
 def complete_task(tasks, WEEKDAYS):
     task_name = input("Name of task: ").capitalize()
 
@@ -92,7 +107,7 @@ def complete_task(tasks, WEEKDAYS):
                 break
 
 
-# 3. Remove task
+# 4. Remove task
 def remove_task(tasks):
     task_name = input("Name of task: ").capitalize()
     
@@ -105,7 +120,7 @@ def remove_task(tasks):
     print("\nTHAT TASK DOES NOT EXIST")
 
 
-# 4. View current tasks
+# 5. View current tasks
 def print_current_tasks(tasks, WEEKDAY_ORDER):
     sorted_current_tasks = sorted(
             (task for task in tasks if not task["completed"]),
@@ -120,16 +135,16 @@ def print_current_tasks(tasks, WEEKDAY_ORDER):
     k = 0
     for i in sorted_current_tasks:
         k += 1
-        print(
-            "TASK #" + str(k) + "\n",
-            i["name"] + "\n",
-            i["weekday"] + "\n",
-            "--------------------------------",
-            sep=""
-        )
+        print(f"TASK #{k} - {i['weekday']}")
+        print(f"• {i['name']}")
+
+        for subtask in i.get("subtask", []):
+            print(f"  • {subtask}")
+
+        print("--------------------------------")
 
 
-# 5. View completed tasks
+# 6. View completed tasks
 def print_completed_tasks(tasks, WEEKDAY_ORDER):
     sorted_completed_tasks = sorted(
             (task for task in tasks if task["completed"]),
