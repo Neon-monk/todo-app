@@ -61,7 +61,7 @@ def main():
 # Option functions
 # 1. Add task
 def add_task(tasks, WEEKDAYS):
-    task_name = input("Name of task: ").capitalize()
+    task_name = input("Name of task: ").strip().capitalize()
 
     print(
         "\n1. Monday",
@@ -87,7 +87,7 @@ def add_task(tasks, WEEKDAYS):
 # 2. Add subtask
 def add_subtask(tasks):
     while True:
-        task_name = input("Name of task: ").capitalize()
+        task_name = input("Name of task: ").strip().capitalize()
         task = next((task for task in tasks if task["name"] == task_name), None)
 
         if task is not None:
@@ -98,7 +98,7 @@ def add_subtask(tasks):
     subtasks = task.setdefault("subtask", [])
 
     while True:
-        subtask_name = input("Name of subtask: ").capitalize()
+        subtask_name = input("Name of subtask: ").strip().capitalize()
 
         if subtask_name not in subtasks:
             subtasks.append(subtask_name)
@@ -108,29 +108,32 @@ def add_subtask(tasks):
 
 # 3. Complete task
 def complete_task(tasks, WEEKDAYS):
-    task_name = input("Name of task: ").capitalize()
+    task_name = input("Name of task: ").strip().capitalize()
 
-    # Iterate through tasks and check for correct task name
     for task in tasks:
         if task["name"] == task_name:
             if task["completed"]:
-                print("\nTHAT TASK WAS ALREADY COMPLETED ON " + task["completed_at"])
-                break
-            else:
-                task["completed"] = True
-                task["completed_at"] = datetime.now().strftime("%-m/%-d/%y - %-I:%M")
-                break
+                print(f"\nTHAT TASK WAS ALREADY COMPLETED ON {task.get('completed_at', 'unknown')}")
+                return
+
+            task["completed"] = True
+            task["completed_at"] = datetime.now().strftime("%m/%d/%y - %I:%M %p")
+            print(f"\n{task_name} marked as complete")
+            return
+
+    print("\nTHAT TASK DOES NOT EXIST")
 
 
 # 4. Remove task
 def remove_task(tasks):
-    task_name = input("Name of task: ").capitalize()
+    task_name = input("Name of task: ").strip().capitalize()
     
     # Iterate through tasks and check for correct task name
     for task in tasks:
         if task["name"] == task_name:
             tasks.remove(task)
-            break
+            print(f"\n{task_name} removed")
+            return
 
     print("\nTHAT TASK DOES NOT EXIST")
 
