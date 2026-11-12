@@ -18,7 +18,7 @@ def main():
     WEEKDAY_ORDER = {day: int(number) for number, day in WEEKDAYS.items()}
     
     # Automatically display tasks at start
-    print_current_tasks(tasks, WEEKDAYS)
+    print_current_tasks(tasks, WEEKDAY_ORDER)
     
     while True:
         # Prompt user for next action
@@ -33,8 +33,14 @@ def main():
             sep="\n"
         )
 
-        # Prompt user for next action and convert choice to integer
-        action = int(input("What would you like to do?  Enter a number: "))
+        # Prompt again until user enters an action from 1 to 7
+        while True:
+            choice = input("What would you like to do?  Enter a number: ").strip()
+            if choice in {"1", "2", "3", "4", "5", "6", "7"}:
+                action = int(choice)
+                break
+            print("\nINVALID CHOICE. PLEASE ENTER A NUMBER BETWEEN 1 AND 7.\n")
+
         print()
 
         if action == 1:
@@ -80,16 +86,25 @@ def add_task(tasks, WEEKDAYS):
 
 # 2. Add subtask
 def add_subtask(tasks):
-    task_name = input("Name of task: ").capitalize()
-    subtask_name = input("Name of subtask: ").capitalize()
+    while True:
+        task_name = input("Name of task: ").capitalize()
+        task = next((task for task in tasks if task["name"] == task_name), None)
 
-    # Iterate through tasks and check for correct task name
-    for task in tasks:
-        if task["name"] == task_name:
-            if "subtask" not in task:
-                task["subtask"] = []
-            task["subtask"].append(subtask_name)
+        if task is not None:
             break
+
+        print("\nTHAT TASK DOES NOT EXIST\n")
+
+    subtasks = task.setdefault("subtask", [])
+
+    while True:
+        subtask_name = input("Name of subtask: ").capitalize()
+
+        if subtask_name not in subtasks:
+            subtasks.append(subtask_name)
+            return
+
+        print("\nTHAT SUBTASK ALREADY EXISTS\n")
 
 # 3. Complete task
 def complete_task(tasks, WEEKDAYS):
@@ -123,8 +138,8 @@ def remove_task(tasks):
 # 5. View current tasks
 def print_current_tasks(tasks, WEEKDAY_ORDER):
     sorted_current_tasks = sorted(
-            (task for task in tasks if not task["completed"]),
-            key=lambda task: WEEKDAY_ORDER[task["weekday"]],
+        (task for task in tasks if not task["completed"]),
+        key=lambda task: WEEKDAY_ORDER[task["weekday"]],
     )
 
     if not sorted_current_tasks:
@@ -132,16 +147,21 @@ def print_current_tasks(tasks, WEEKDAY_ORDER):
         return
     
     # Print sorted current tasks
-    k = 0
-    for i in sorted_current_tasks:
-        k += 1
-        print(f"TASK #{k} - {i['weekday']}")
-        print(f"• {i['name']}")
+    current_weekday = None
+    for task in sorted_current_tasks:
+        if task["weekday"] != current_weekday:
+            if current_weekday is not None:
+                print("--------------------------------")
 
-        for subtask in i.get("subtask", []):
+            current_weekday = task["weekday"]
+            print(current_weekday)
+
+        print(f"• {task['name']}")
+
+        for subtask in task.get("subtask", []):
             print(f"  • {subtask}")
 
-        print("--------------------------------")
+    print("--------------------------------")
 
 
 # 6. View completed tasks
@@ -170,6 +190,5 @@ def print_completed_tasks(tasks, WEEKDAY_ORDER):
 main()
 
 # FEATURES TO ADD
-    # Add substeps
     # Suggestions from AI?
         # Create a task class?
