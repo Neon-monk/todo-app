@@ -1,24 +1,21 @@
 from datetime import datetime
 import sys
 
-from matplotlib.dates import WEEKDAYS
-
 def main():
     # Initialize task list
     tasks = []
-    WEEKDAYS = {
-                "1": "Monday",
-                "2": "Tuesday",
-                "3": "Wednesday",
-                "4": "Thursday",
-                "5": "Friday",
-                "6": "Saturday",
-                "7": "Sunday",
-    }
-    WEEKDAY_ORDER = {day: int(number) for number, day in WEEKDAYS.items()}
+    WEEKDAYS = (
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    )
     
     # Automatically display tasks at start
-    print_current_tasks(tasks, WEEKDAY_ORDER)
+    print_current_tasks(tasks, WEEKDAYS)
     
     while True:
         # Prompt user for next action
@@ -48,19 +45,19 @@ def main():
         elif action == 2:
             add_subtask(tasks)
         elif action == 3:
-            complete_task(tasks, WEEKDAYS)
+            complete_task(tasks)
         elif action == 4:
             remove_task(tasks)
         elif action == 5:
-            print_current_tasks(tasks, WEEKDAY_ORDER)
+            print_current_tasks(tasks, WEEKDAYS)
         elif action == 6:
-            print_completed_tasks(tasks, WEEKDAY_ORDER)
+            print_completed_tasks(tasks, WEEKDAYS)
         elif action == 7:
             sys.exit()
 
 # Option functions
 # 1. Add task
-def add_task(tasks, WEEKDAYS):
+def add_task(tasks, weekdays):
     task_name = input("Name of task: ").strip().capitalize()
 
     print(
@@ -74,12 +71,20 @@ def add_task(tasks, WEEKDAYS):
         sep="\n"
     )
 
-    # Prompt user for weekday number and check if valid
+    # Prompt for weekday number or name and check if valid
     while True:
-        task_day = WEEKDAYS.get(input("Weekday: ").strip())
+        weekday_input = input("Weekday: ").strip()
+        if weekday_input.isdigit() and 1 <= int(weekday_input) <= len(weekdays):
+            task_day = weekdays[int(weekday_input) - 1]
+        else:
+            task_day = next(
+                (day for day in weekdays if day.casefold() == weekday_input.casefold()),
+                None,
+            )
+
         if task_day is not None:
             break
-        print("\nINVALID WEEKDAY NUMBER. PLEASE ENTER A NUMBER BETWEEN 1 AND 7.\n")
+        print("\nINVALID WEEKDAY. ENTER A NUMBER OR NAME, SUCH AS 1 OR Monday.\n")
 
     # Add to tasks
     tasks.append({"name": task_name, "weekday": task_day, "completed": False})
@@ -107,7 +112,7 @@ def add_subtask(tasks):
         print("\nTHAT SUBTASK ALREADY EXISTS\n")
 
 # 3. Complete task
-def complete_task(tasks, WEEKDAYS):
+def complete_task(tasks):
     task_name = input("Name of task: ").strip().capitalize()
 
     for task in tasks:
@@ -139,10 +144,10 @@ def remove_task(tasks):
 
 
 # 5. View current tasks
-def print_current_tasks(tasks, WEEKDAY_ORDER):
+def print_current_tasks(tasks, weekdays):
     sorted_current_tasks = sorted(
         (task for task in tasks if not task["completed"]),
-        key=lambda task: WEEKDAY_ORDER[task["weekday"]],
+        key=lambda task: weekdays.index(task["weekday"]),
     )
 
     if not sorted_current_tasks:
@@ -168,10 +173,10 @@ def print_current_tasks(tasks, WEEKDAY_ORDER):
 
 
 # 6. View completed tasks
-def print_completed_tasks(tasks, WEEKDAY_ORDER):
+def print_completed_tasks(tasks, weekdays):
     sorted_completed_tasks = sorted(
             (task for task in tasks if task["completed"]),
-            key=lambda task: WEEKDAY_ORDER[task["weekday"]],
+            key=lambda task: weekdays.index(task["weekday"]),
     )
     
     if not sorted_completed_tasks:
@@ -190,8 +195,5 @@ def print_completed_tasks(tasks, WEEKDAY_ORDER):
             sep=""
         )
 
-main()
-
-# FEATURES TO ADD
-    # Suggestions from AI?
-        # Create a task class?
+if __name__ == "__main__":
+    main()
